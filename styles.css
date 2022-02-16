@@ -1,0 +1,17 @@
+.parcell {
+    background-color: rgb(114, 191, 236);
+}
+
+.void {
+    background-color: rgb(0, 143, 55);
+}
+
+.path {
+    background-color: rgb(226, 205, 84);
+}
+
+.path, .parcell, .void {
+    height: 50px;
+    width: 50px;
+    border-style: outset;
+}
