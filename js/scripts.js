@@ -5,7 +5,7 @@ function startGame() {
     nave.src = "../imgs/nave.png";
     nave.height = 100;
     nave.focus();
-    nave.onmousedown = function(event) {
+    nave.onmousedown = function (event) {
         shipRotation += 45;
         console.log(shipRotation);
         nave.style.transform = "rotate(" + shipRotation.toString() + "deg)";
@@ -23,8 +23,27 @@ function buildMap(xLength, yLength) {
     0 - Terreno vacio
     1 - Camino
     2 - Parcela
+    3 - Parcela inicio
+    4 - Parcela final
     */
-    let grid = mapGenerator(xLength, yLength);
+    //let grid = mapGenerator(xLength, yLength);
+    let grid = [
+        [0, 0, 0, 0, 0, 0, 0, 4, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 2, 0],
+        [0, 0, 2, 0, 0, 2, 0, 1, 0, 0],
+        [2, 1, 1, 1, 1, 0, 0, 1, 2, 0],
+        [0, 1, 2, 0, 1, 0, 0, 1, 0, 0],
+        [2, 1, 0, 0, 1, 0, 2, 1, 0, 0],
+        [0, 1, 0, 0, 1, 1, 1, 1, 2, 0],
+        [2, 1, 2, 0, 0, 0, 0, 2, 0, 0],
+        [0, 1, 0, 0, 2, 0, 0, 0, 2, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+        [0, 2, 0, 0, 0, 2, 0, 2, 1, 0],
+        [0, 0, 0, 0, 0, 0, 2, 0, 1, 0],
+        [0, 0, 0, 0, 0, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 3, 0, 0, 0, 2]
+    ]
     let x = grid[0].length;
     let y = grid.length;
     map.style.gridTemplateColumns = "50px ".repeat(x);
@@ -38,9 +57,13 @@ function buildMap(xLength, yLength) {
             let type;
             if (part == 1) {
                 type = "path";
-            }else if (part == 2) {
+            } else if (part == 2) {
                 type = "parcell";
-            }else {
+            } else if (part == 3) {
+                type = "path-start";
+            } else if (part == 4) {
+                type = "path-end";
+            } else {
                 type = "void";
             }
             mapPart = buildPart(type);
@@ -99,8 +122,8 @@ function mapGenerator(sizeX, sizeY) {
 
         if (
             inRange(position.y, 0, map.length)
-            
-        ) {}
+
+        ) { }
     }
 
     let position = {
@@ -108,6 +131,111 @@ function mapGenerator(sizeX, sizeY) {
         y: sizeY - 1
     };
     partBuilder(map, position, 1);
-    
+
     return map;
+}
+
+class Enemy {
+    constructor(posX, posY, type) {
+        this.posX = posX;
+        this.posY = posY;
+        this.type = type;
+        if (type == 1) {
+            this.interval = 15;
+            this.hp = 40;
+            this.image = "../imgs/enemy_1.png";
+        }
+        else if (type == 2) {
+            this.interval = 10;
+            this.hp = 80;
+            this.image = "../imgs/enemy_2.png";
+        }
+        else if (type == 3) {
+            this.interval = 5;
+            this.hp = 100;
+            this.image = "../imgs/enemy_3.png";
+        }
+        this.element = document.createElement("div");
+        this.element.style.position = "absolute";
+
+        this.element.innerHTML = '<img src="' + this.image + '" alt="Enemy image">';
+
+        var width = this.element.clientWidth;
+        var height = this.element.clientHeight;
+
+        this.element.style.marginLeft = -width + 'px';
+        this.element.style.marginTop = -height + 'px';
+
+        console.log("Enemigo inicializado");
+        //console.log(this);
+    }
+
+    movePosition(moveX, moveY) {
+        //console.log("Moviendo");
+        this.element.style.left = this.element.getBoundingClientRect().left + moveX + 'px';
+        this.element.style.top = this.element.getBoundingClientRect().top + moveY + 'px';
+    }
+
+    die() {
+        this.element.remove();
+    }
+
+    start() {
+        document.getElementById("game").appendChild(this.element);
+    }
+}
+
+class Spawn {
+    constructor() {
+        this.enemys = [];
+        console.log("Spawn inicializado");
+        //console.log(this);
+    }
+
+    updateEnemies() {
+        let enemy;
+        let posX;
+        let posY;
+        for (let i = 0; i < this.enemys.length; i++) {
+            enemy = this.enemys[i]
+            enemy.movePosition(0, -enemy.interval);
+            posX = enemy.element.style.top.slice(0, -2);
+            posY = enemy.element.style.left.slice(0, -2);
+            if (posX < 0 || posY < 0 || enemy.hp <= 0) {
+                enemy.die();
+                this.enemys.splice(i, 1);
+            }
+        }
+        //console.log(this.enemys);
+    }
+
+    spawnEnemy(enemyNum) {
+        let maxType = 3;
+        let minType = 1;
+        let type;
+        let gameLoop;
+        for (let i = 0; i < enemyNum; i++) {
+            type = Math.floor(Math.random() * maxType) + minType;
+            this.enemys.push(new Enemy(5, 5, type));
+        }
+        for (let i = 0; i < this.enemys.length; i++) {
+            this.enemys[i].start();
+        }
+        this.loop(gameLoop);
+    }
+
+    loop(gameLoop) {
+        if (!gameLoop) {
+            gameLoop = setInterval(
+                () => this.updateEnemies(),
+                1000
+            );
+        }
+    }
+}
+
+var spawn = new Spawn();
+
+function pruebas() {
+    spawn.spawnEnemy(1);
 }

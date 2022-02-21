@@ -10,7 +10,15 @@
     background-color: rgb(226, 205, 84);
 }
 
-.path, .parcell, .void {
+.path-start {
+    background-color: rgb(226, 160, 84);
+}
+
+.path-end {
+    background-color: rgb(84, 226, 108);
+}
+
+.path, .parcell, .void, .path-start, .path-end {
     height: 50px;
     width: 50px;
     /*
