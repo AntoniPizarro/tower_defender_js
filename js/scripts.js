@@ -141,17 +141,17 @@ class Enemy {
         this.posY = posY;
         this.type = type;
         if (type == 1) {
-            this.interval = 15;
+            this.interval = 3;
             this.hp = 40;
             this.image = "../imgs/enemy_1.png";
         }
         else if (type == 2) {
-            this.interval = 10;
+            this.interval = 2;
             this.hp = 80;
             this.image = "../imgs/enemy_2.png";
         }
         else if (type == 3) {
-            this.interval = 5;
+            this.interval = 1;
             this.hp = 100;
             this.image = "../imgs/enemy_3.png";
         }
@@ -160,11 +160,13 @@ class Enemy {
 
         this.element.innerHTML = '<img src="' + this.image + '" alt="Enemy image">';
 
-        var width = this.element.clientWidth;
-        var height = this.element.clientHeight;
+        this.element.style.left = posX.toString() + "px";
+        this.element.style.top = posY.toString() + "px";
+        let width = this.element.style.width;
+        let height = this.element.style.height;
 
-        this.element.style.marginLeft = -width + 'px';
-        this.element.style.marginTop = -height + 'px';
+        this.element.style.marginTop = -parseInt(width / 2).toString() + "px";
+        this.element.style.marginLeft = -parseInt(height / 2).toString() + "px";
 
         console.log("Enemigo inicializado");
         //console.log(this);
@@ -198,6 +200,7 @@ class Spawn {
         let posY;
         for (let i = 0; i < this.enemys.length; i++) {
             enemy = this.enemys[i]
+            //enemy.movePosition(enemy.interval, 0);
             enemy.movePosition(0, -enemy.interval);
             posX = enemy.element.style.top.slice(0, -2);
             posY = enemy.element.style.left.slice(0, -2);
@@ -217,7 +220,7 @@ class Spawn {
         let gameLoop;
         for (let i = 0; i < enemyNum; i++) {
             type = Math.floor(Math.random() * maxType) + minType;
-            this.enemys.push(new Enemy(5, 5, type));
+            this.enemys.push(new Enemy(50, 500, type));
         }
         for (let i = 0; i < this.enemys.length; i++) {
             this.enemys[i].start();
@@ -228,7 +231,7 @@ class Spawn {
         if (!gameLoop) {
             gameLoop = setInterval(
                 () => this.updateEnemies(),
-                1000
+                200
             );
         }
     }
@@ -238,5 +241,13 @@ var spawn = new Spawn();
 spawn.loop();
 
 function pruebas() {
-    spawn.spawnEnemy(1);
+    let num = document.getElementById("aaaaaaa").value;
+    if (num < 1) {
+        num = 1;
+    }else if (num > 10) {
+        num = 10;
+    }
+    document.getElementById("aaaaaaa").value = num;
+
+    spawn.spawnEnemy(num);
 }
