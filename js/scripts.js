@@ -206,6 +206,7 @@ class Spawn {
                 this.enemys.splice(i, 1);
             }
         }
+        return 0;
         //console.log(this.enemys);
     }
 
@@ -221,7 +222,6 @@ class Spawn {
         for (let i = 0; i < this.enemys.length; i++) {
             this.enemys[i].start();
         }
-        this.loop(gameLoop);
     }
 
     loop(gameLoop) {
@@ -235,6 +235,7 @@ class Spawn {
 }
 
 var spawn = new Spawn();
+spawn.loop();
 
 function pruebas() {
     spawn.spawnEnemy(1);
